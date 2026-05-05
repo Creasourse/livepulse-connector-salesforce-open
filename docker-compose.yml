@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  salesforce-connector:
+    image: livepulse/salesforce-connector:${TAG}
+    container_name: salesforce-connector
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${APP_PORT_SALESFORCE}:23008"
+    env_file:
+      - .env
+    volumes:
+      - ./volumes/app/log:/data/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:23008/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
